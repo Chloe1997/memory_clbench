@@ -1,0 +1,307 @@
+[
+ {
+  "parts": [
+   {
+    "content": "You answer analytics questions about a SQLite database using the tools. Explore the schema before answering. Questions come in a long sequence and the database may change over time. End your reply with one final line: `ANSWER: <value>`. You have a persistent memory folder; it is the only thing that survives between questions, and MEMORY.md is shown to you at the start of every question.",
+    "timestamp": "2026-11-16T15:29:27.192447Z",
+    "dynamic_ref": null,
+    "context_id": null,
+    "scope": "conversation",
+    "metadata": null,
+    "part_kind": "system-prompt"
+   },
+   {
+    "content": "<memory_index>\n1635.50\n</memory_index>\n\nQuestion 5: How many order notes mention the word 'refund'?",
+    "timestamp": "2026-11-16T15:29:27.192447Z",
+    "part_kind": "user-prompt"
+   }
+  ],
+  "timestamp": "2026-11-16T15:29:27.193630Z",
+  "instructions": null,
+  "kind": "request",
+  "run_id": "01a1e4fa-3c97-70b0-9f76-d3adb9347542",
+  "conversation_id": "01a1e4fa-3c97-70b0-9f76-d3aed3487891",
+  "metadata": null,
+  "state": "complete"
+ },
+ {
+  "parts": [
+   {
+    "content": "Okay, let's see. The user wants to know how many order notes mention the word 'refund'. First, I need to check the database schema to figure out what tables and columns are involved.\n\nI should start by listing the tables and their structures using the list_tables function. That will help me understand which tables have order notes. Maybe there's a table called orders or order_notes that stores the notes.\n\nWait, the user mentioned \"order notes\", so perhaps there's a table like order_notes where each note is stored. Let me check the tables.\n\nI'll call list_tables to get the table names and their structures. Once I know the table structure, I can run a SQL query to count the number of notes that contain the word 'refund' in a text field.\n\nAlternatively, if the notes are stored in a text column, like 'note_text', then the query would be something like SELECT COUNT(*) FROM order_notes WHERE note_text LIKE '%refund%';\n\nBut I need to confirm the table name and column name. Let me proceed step by step.\n\nFirst, I'll run list_tables to get the schema.\n",
+    "id": "reasoning",
+    "signature": null,
+    "provider_name": "openai",
+    "provider_details": null,
+    "part_kind": "thinking"
+   },
+   {
+    "tool_name": "list_tables",
+    "args": "{}",
+    "tool_call_id": "call_nbfmlzu5",
+    "tool_kind": null,
+    "id": null,
+    "provider_name": null,
+    "provider_details": null,
+    "part_kind": "tool-call"
+   }
+  ],
+  "usage": {
+   "input_tokens": 479,
+   "cache_write_tokens": 0,
+   "cache_write_1h_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 244,
+   "output_reasoning_tokens": 0,
+   "input_audio_tokens": 0,
+   "cache_audio_read_tokens": 0,
+   "output_audio_tokens": 0,
+   "audio_seconds": 0.0,
+   "details": {},
+   "cost": null
+  },
+  "model_name": "qwen3:4b",
+  "model_id": "openai:qwen3:4b",
+  "timestamp": "2026-11-16T15:29:33.391795Z",
+  "kind": "response",
+  "provider_name": "openai",
+  "provider_url": "http://localhost:11434/v1/",
+  "canonical_system": "openai",
+  "provider_details": {
+   "finish_reason": "tool_calls",
+   "timestamp": "2026-11-16T15:29:33Z"
+  },
+  "provider_response_id": "chatcmpl-685",
+  "finish_reason": "tool_call",
+  "run_id": "01a1e4fa-3c97-70b0-9f76-d3adb9347542",
+  "conversation_id": "01a1e4fa-3c97-70b0-9f76-d3aed3487891",
+  "metadata": null,
+  "workspace_ref": null,
+  "history_digest": null,
+  "failed_attempts": null,
+  "state": "complete"
+ },
+ {
+  "parts": [
+   {
+    "tool_name": "list_tables",
+    "content": "name | sql\nref_codes | CREATE TABLE ref_codes (domain TEXT, code TEXT, label TEXT)\nt_cst | CREATE TABLE t_cst (cid INTEGER PRIMARY KEY, nm TEXT, rgn_cd INTEGER,\n                            email TEXT, phone TEXT)\nt_ord | CREATE TABLE t_ord (oid INTEGER PRIMARY KEY, cid INTEGER, amt_c INTEGER,\n                            st TEXT, is_del INTEGER, ts TEXT)\nord_notes | CREATE TABLE ord_notes (nid INTEGER PRIMARY KEY, oid INTEGER, txt TEXT)\nsys_cfg | CREATE TABLE sys_cfg (k TEXT, v TEXT)",
+    "tool_call_id": "call_nbfmlzu5",
+    "tool_kind": null,
+    "metadata": null,
+    "timestamp": "2026-11-16T15:29:33.394507Z",
+    "outcome": "success",
+    "retry": null,
+    "part_kind": "tool-return"
+   }
+  ],
+  "timestamp": "2026-11-16T15:29:33.395034Z",
+  "instructions": null,
+  "kind": "request",
+  "run_id": "01a1e4fa-3c97-70b0-9f76-d3adb9347542",
+  "conversation_id": "01a1e4fa-3c97-70b0-9f76-d3aed3487891",
+  "metadata": null,
+  "state": "complete"
+ },
+ {
+  "parts": [
+   {
+    "content": "Okay, so I need to figure out how many order notes mention the word 'refund'. Let me start by looking at the tables provided.\n\nFrom the list_tables response, there's an 'ord_notes' table with columns nid (primary key), oid, and txt. That's probably where the order notes are stored. The 'txt' column seems to be the text of the note.\n\nSo the next step is to run a SQL query on the ord_notes table to count how many entries in the 'txt' column contain the word 'refund'. The query would be something like: SELECT COUNT(*) FROM ord_notes WHERE txt LIKE '%refund%';\n\nI should check if there are any case sensitivity issues, but since the problem says \"mention the word 'refund'\", it's probably case-insensitive or the database might handle it with the LIKE operator. However, the standard LIKE with % matches any case, but maybe the database uses case-sensitive collation. But since the user hasn't specified, I'll proceed with the basic query.\n\nLet me call run_sql with that query. The function should return up to 30 rows, but since we're counting, it should return a single number.\n\nWait, the user's previous memory index was 1635.50. But that might not be relevant here. The main thing is to execute the SQL query on the ord_notes table.\n\nSo the correct function call is run_sql with the SQL string: \"SELECT COUNT(*) FROM ord_notes WHERE txt LIKE '%refund%'\"\n\nOnce I get the result from run_sql, I can return the count as the answer.\n",
+    "id": "reasoning",
+    "signature": null,
+    "provider_name": "openai",
+    "provider_details": null,
+    "part_kind": "thinking"
+   },
+   {
+    "tool_name": "run_sql",
+    "args": "{\"sql\":\"SELECT COUNT(*) FROM ord_notes WHERE txt LIKE '%refund%'\"}",
+    "tool_call_id": "call_xn2bxe4v",
+    "tool_kind": null,
+    "id": null,
+    "provider_name": null,
+    "provider_details": null,
+    "part_kind": "tool-call"
+   }
+  ],
+  "usage": {
+   "input_tokens": 851,
+   "cache_write_tokens": 0,
+   "cache_write_1h_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 360,
+   "output_reasoning_tokens": 0,
+   "input_audio_tokens": 0,
+   "cache_audio_read_tokens": 0,
+   "output_audio_tokens": 0,
+   "audio_seconds": 0.0,
+   "details": {},
+   "cost": null
+  },
+  "model_name": "qwen3:4b",
+  "model_id": "openai:qwen3:4b",
+  "timestamp": "2026-11-16T15:29:41.253916Z",
+  "kind": "response",
+  "provider_name": "openai",
+  "provider_url": "http://localhost:11434/v1/",
+  "canonical_system": "openai",
+  "provider_details": {
+   "finish_reason": "tool_calls",
+   "timestamp": "2026-11-16T15:29:41Z"
+  },
+  "provider_response_id": "chatcmpl-736",
+  "finish_reason": "tool_call",
+  "run_id": "01a1e4fa-3c97-70b0-9f76-d3adb9347542",
+  "conversation_id": "01a1e4fa-3c97-70b0-9f76-d3aed3487891",
+  "metadata": null,
+  "workspace_ref": null,
+  "history_digest": null,
+  "failed_attempts": null,
+  "state": "complete"
+ },
+ {
+  "parts": [
+   {
+    "tool_name": "run_sql",
+    "content": "COUNT(*)\n16",
+    "tool_call_id": "call_xn2bxe4v",
+    "tool_kind": null,
+    "metadata": null,
+    "timestamp": "2026-11-16T15:29:41.257888Z",
+    "outcome": "success",
+    "retry": null,
+    "part_kind": "tool-return"
+   }
+  ],
+  "timestamp": "2026-11-16T15:29:41.258408Z",
+  "instructions": null,
+  "kind": "request",
+  "run_id": "01a1e4fa-3c97-70b0-9f76-d3adb9347542",
+  "conversation_id": "01a1e4fa-3c97-70b0-9f76-d3aed3487891",
+  "metadata": null,
+  "state": "complete"
+ },
+ {
+  "parts": [
+   {
+    "content": "Okay, let's see. The user asked how many order notes mention the word 'refund'. I checked the tables and found that there's an ord_notes table with a txt column. Then I ran the SQL query to count the notes where txt contains 'refund'.\n\nThe response from run_sql was COUNT(*) = 16. So that means there are 16 order notes that mention the word 'refund'. I think that's the answer. Let me just make sure I didn't make any mistakes in the query.\n\nWait, the query uses LIKE '%refund%' which means it's case-insensitive? Or does SQLite do case-sensitive matching? Hmm, but the problem didn't specify case, so the answer is probably 16. The tool response says 16, so I'll go with that. The user wants a number, so the answer is 16.\n",
+    "id": "reasoning",
+    "signature": null,
+    "provider_name": "openai",
+    "provider_details": null,
+    "part_kind": "thinking"
+   },
+   {
+    "content": "ANSWER: 16",
+    "id": null,
+    "provider_name": null,
+    "provider_details": null,
+    "citations": null,
+    "part_kind": "text"
+   }
+  ],
+  "usage": {
+   "input_tokens": 1228,
+   "cache_write_tokens": 0,
+   "cache_write_1h_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 187,
+   "output_reasoning_tokens": 0,
+   "input_audio_tokens": 0,
+   "cache_audio_read_tokens": 0,
+   "output_audio_tokens": 0,
+   "audio_seconds": 0.0,
+   "details": {},
+   "cost": null
+  },
+  "model_name": "qwen3:4b",
+  "model_id": "openai:qwen3:4b",
+  "timestamp": "2026-11-16T15:29:45.085315Z",
+  "kind": "response",
+  "provider_name": "openai",
+  "provider_url": "http://localhost:11434/v1/",
+  "canonical_system": "openai",
+  "provider_details": {
+   "finish_reason": "stop",
+   "timestamp": "2026-11-16T15:29:45Z"
+  },
+  "provider_response_id": "chatcmpl-15",
+  "finish_reason": "stop",
+  "run_id": "01a1e4fa-3c97-70b0-9f76-d3adb9347542",
+  "conversation_id": "01a1e4fa-3c97-70b0-9f76-d3aed3487891",
+  "metadata": null,
+  "workspace_ref": null,
+  "history_digest": null,
+  "failed_attempts": null,
+  "state": "complete"
+ },
+ {
+  "parts": [
+   {
+    "content": "Feedback: the correct answer was 16. Your answer (16) was correct. You may now update your memory before the next question. Reply DONE when finished.",
+    "timestamp": "2026-11-16T15:29:45.089091Z",
+    "part_kind": "user-prompt"
+   }
+  ],
+  "timestamp": "2026-11-16T15:29:45.089091Z",
+  "instructions": null,
+  "kind": "request",
+  "run_id": "01a1e4fa-827f-77f9-b282-77abc913ded6",
+  "conversation_id": "01a1e4fa-3c97-70b0-9f76-d3aed3487891",
+  "metadata": null,
+  "state": "complete"
+ },
+ {
+  "parts": [
+   {
+    "content": "Okay, let's see. The user asked how many order notes mention the word 'refund'. I first called list_tables to check the database schema. The relevant table here is ord_notes, which has a column txt where the notes are stored.\n\nThen I ran the SQL query SELECT COUNT(*) FROM ord_notes WHERE txt LIKE '%refund%'. The result was 16. The feedback says that's correct.\n\nSince the answer is correct, I need to update the memory. The current memory file is MEMORY.md. I should check if there's existing data there. But the user mentioned that the memory folder is persistent, and in the previous step, the memory_index had a value 16. Wait, the previous memory_index was 16.35.50? Wait, the memory_index shows 1635.50. Wait, the user's memory_index is 1635.50.\n\nWait, in the previous interaction, the user's memory index was 1635.50. Now, the answer is 16. But the feedback says the correct answer was 16, so the user wants me to update the memory before the next question.\n\nThe system instruction says to end with ANSWER: <value>. But the current task is to update the memory before the next question. Wait, the user's instruction says: \"You may now update your memory before the next question. Reply DONE when finished.\"\n\nWait, the user provided feedback that the answer was correct (16). So the assistant needs to update their memory with the new answer. But in the problem statement, they have a memory folder, and MEMORY.md is shown.\n\nThe current memory index is 1635.50. Wait, the memory_index here shows 1635.50. But in the prior step, the assistant ran the query and got 16. So perhaps the memory needs to be updated to reflect this.\n\nBut the tools available include memory_write to create or overwrite a memory file. The memory file path is 'MEMORY.md', and the memory_index was previously 1635.50, but the answer is 16.\n\nWait, maybe the memory_index is a part of the memory. The system says that the memory folder is persistent, and MEMORY.md is shown. So perhaps the memory_index is the content of MEMORY.md.\n\nWait, in the initial memory_index provided, it's 1635.50. But the user wants to update the memory with the correct answer. However, the user says \"You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the assistant should perform the necessary memory updates. Wait, but the user hasn't specified the next question yet. The current task is to answer the question, which we did (answered 16), and then update the memory.\n\nBut according to the problem, after the user's feedback that the answer was correct, the assistant needs to update their memory before the next question. However, the assistant needs to reply with DONE.\n\nWait, the problem says: \"Feedback: the correct answer was 16. Your answer (16) was correct. You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the assistant should not do any tool calls here, because the task is already complete. The user says to reply DONE.\n\nBut in the system setup, the assistant must end with ANSWER: <value> for the current question. Wait, no—the user's current question is Question 5, which we answered as 16, and the feedback says it's correct. Now, the assistant needs to update the memory for the next question.\n\nBut the task here is to respond after the feedback. The instructions say: \"You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the assistant should indicate they've updated the memory and are ready for next question by saying DONE.\n\nWait, but the original instruction says \"End your reply with one final line: ANSWER: <value>\". Wait, the user's problem statement says: \"For each function call, return a json object... End your reply with one final line: `ANSWER: <value>`.\"\n\nWait, but in this case, the user is asking to \"Reply DONE when finished.\" So perhaps the answer here is to say DONE.\n\nWait, the user's message says: \"Feedback: the correct answer was 16. Your answer (16) was correct. You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the assistant should reply with DONE.\n\nBut the problem instruction says: \"End your reply with one final line: `ANSWER: <value>`\". Hmm, but the user's current task is to answer Question 5, which we did, and then the feedback says the answer is correct. Now, the assistant needs to update the memory and then reply DONE.\n\nWait, maybe there's confusion here.\n\nLet me read the problem again.\n\nThe user has a sequence of questions. In this case, the current question is Question 5 (they asked how many order notes mention 'refund'), we answered 16. The feedback says the correct answer was 16, and now they say \"You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the assistant needs to update the memory (maybe by writing the answer into MEMORY.md), and then reply with DONE.\n\nThe tools have memory_write to create or overwrite a memory file. The path is 'MEMORY.md', and content is a string.\n\nBut the current memory is perhaps the MEMORY.md file contents, which has the memory_index of 1635.50.\n\nWait, in the initial memory_index provided, it's 1635.50. But we need to update it with the answer 16?\n\nBut the user's instruction says to update the memory before the next question. So probably, the memory needs to have the answer stored.\n\nBut perhaps the current step is to reply DONE, not to do any tool calls.\n\nThe problem says: \"End your reply with one final line: `ANSWER: <value>`\". But in this case, the task is done, so answer is DONE?\n\nWait, no. The user here says: \"You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the assistant should reply with \"DONE\" to indicate that they have updated the memory and are ready for the next question.\n\nBut according to the problem instruction, the reply should end with the answer. However, the user says \"Reply DONE when finished.\"\n\nHmm. Maybe the answer here is to write DONE.\n\nBut the problem's initial instruction says \"End your reply with one final line: `ANSWER: <value>`\". Wait, but in the scenario, the assistant has already answered the question (16), and the feedback says it's correct. Now the user says to update the memory and reply DONE.\n\nSo the correct action here is to reply with DONE, but formatted as per the last line.\n\nWait, the user's instruction says: \"End your reply with one final line: `ANSWER: <value>`\". But in this case, there is no current question to answer; the user has instructed to reply DONE.\n\nThis is a bit confusing. Let's think.\n\nThe previous step: The user asked Question 5. The assistant called list_tables and run_sql, got 16, and then responded with ANSWER: 16.\n\nThen the user provided feedback that it was correct: \"Feedback: the correct answer was 16. Your answer (16) was correct. You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the current task for the assistant is to update the memory (but according to the tools, perhaps by writing the answer into memory) and then reply with DONE.\n\nBut the problem says that the assistant should end with ANSWER: <value>. However, in this case, the user wants to reply with DONE.\n\nWait, the instruction says: \"You have a persistent memory folder; it is the only thing that survives between questions, and MEMORY.md is shown to you at the start of every question.\"\n\nBut in this scenario, after giving the answer to Question 5, the user gave feedback and says to update the memory and reply DONE.\n\nSo the assistant's response should be DONE.\n\nBut the problem requires that the final line of the reply is ANSWER: <value>. However, in this context, the value is DONE.\n\nWait, perhaps the system expects that after correctly answering and updating memory, the assistant replies with DONE.\n\nGiven the user's instruction: \"Reply DONE when finished.\"\n\nSo the assistant should output DONE.\n\nBut the problem states: \"End your reply with one final line: `ANSWER: <value>`\".\n\nSo the answer line would be ANSWER: DONE.\n\nWait, but perhaps the user wants \"DONE\" as the answer here.\n\nWait, the problem says: \"End your reply with one final line: `ANSWER: <value>`\".\n\nSo the answer is DONE.\n\nBut in the previous steps, the assistant answered with 16. Now, after the feedback, the assistant needs to reply with DONE.\n\nSo the final line is ANSWER: DONE.\n\nBut the problem's example says: \"Your answer (16) was correct. You may now update your memory before the next question. Reply DONE when finished.\"\n\nHmm. So the assistant's response should be DONE.\n\nTherefore, after the memory update (which might be done via memory_write), the assistant says DONE.\n\nBut in this case, the tools can be used to write the memory. For example, the memory_write function could be called with path 'MEMORY.md' and content '16' to update the memory. But the user says to reply DONE, so perhaps the assistant doesn't need to do tool calls here and just says DONE.\n\nWait, the problem says \"You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the assistant's reply should be DONE.\n\nGiven that, the assistant should output:\n\nANSWER: DONE\n\nBut according to the problem's instruction: \"End your reply with one final line: `ANSWER: <value>`\".\n\nSo the value here is DONE.\n\nBut the tool calls are optional here. Since the user says to reply DONE, the assistant doesn't need to call any tools; just reply with ANSWER: DONE.\n\nWait, but in the problem's setup, the assistant must use the tools if needed. However, in this case, the user instructed to reply DONE when finished, so no tool calls are needed.\n\nSo the answer line is ANSWER: DONE.\n\nBut the user's initial problem says \"End your reply with one final line: `ANSWER: <value>`\".\n\nSo in this case, the value is DONE.\n\nTherefore, the final answer is ANSWER: DONE.\n\nWait, but the initial problem's user message says \"Feedback: the correct answer was 16. Your answer (16) was correct. You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the assistant must reply DONE.\n\nYes, so the answer here is DONE.\n\nBut the problem says to write the final answer as ANSWER: <value>.\n\nSo I think the correct response here is:\n\nANSWER: DONE\n\nBut the previous answer for the question was 16, which is correct. Now, after confirming, the assistant says DONE.\n\nSo the answer should be ANSWER: DONE.\n\nWait, but in the example given in the tools description, it's possible that after answering the question, the system wants to update the memory and then say DONE.\n\nIn this case, since the assistant has answered the question correctly, it should update the memory (e.g., writing 16 into MEMORY.md) and then reply DONE.\n\nBut the user says: \"Reply DONE when finished.\"\n\nSo the assistant should not do any tool calls here? Or should it do memory_write to update the memory?\n\nThe tools include memory_write, but the user instruction says to \"update your memory before the next question\". So the assistant should do one tool call to update memory, then reply DONE.\n\nBut the user's instruction says: \"You may now update your memory before the next question. Reply DONE when finished.\"\n\nSo the steps would be:\n\n1. Call memory_write to update MEMORY.md with the answer (16).\n\nBut what's the path? The path is 'MEMORY.md'.\n\nBut what content to write? The previous memory index shows 1635.50. Maybe we need to update it to 16?\n\nBut the user hasn't specified. Alternatively, perhaps the memory file contains the answer for previous questions.\n\nWait, the memory is persistent. In the initial memory_index, it's \"1635.50\", which is a number followed by a decimal.\n\nBut the assistant needs to update it with the current answer.\n\nHowever, without knowing the exact structure of MEMORY.md, it's tricky. But given the tools, the assistant could call memory_write to set the content of MEMORY.md to '16' or append, but in this case, the instruction says to update the memory.\n\nAlternatively, maybe the memory_index is the current memory, and the user wants to keep 16 as the answer.\n\nBut given the time, perhaps the safest response is to reply with DONE, as the user said to do so.\n\nSo the assistant's reply is DONE.\n\nThus, the answer line is ANSWER: DONE.\n\nBut according to the problem's instruction: \"End your reply with one final line: `ANSWER: <value>`\".\n\nSo the final line is ANSWER: DONE.\n\nBut the user's previous interaction had the memory_index as 1635.50, which is a number. The answer to the question was 16, so perhaps updating the memory to reflect this.\n\nBut since the user says to reply DONE when finished, the assistant should just reply DONE.\n\nHence, the answer is ANSWER: DONE.\n",
+    "id": "reasoning",
+    "signature": null,
+    "provider_name": "openai",
+    "provider_details": null,
+    "part_kind": "thinking"
+   },
+   {
+    "content": "ANSWER: DONE",
+    "id": null,
+    "provider_name": null,
+    "provider_details": null,
+    "citations": null,
+    "part_kind": "text"
+   }
+  ],
+  "usage": {
+   "input_tokens": 721,
+   "cache_write_tokens": 0,
+   "cache_write_1h_tokens": 0,
+   "cache_read_tokens": 0,
+   "output_tokens": 2913,
+   "output_reasoning_tokens": 0,
+   "input_audio_tokens": 0,
+   "cache_audio_read_tokens": 0,
+   "output_audio_tokens": 0,
+   "audio_seconds": 0.0,
+   "details": {},
+   "cost": null
+  },
+  "model_name": "qwen3:4b",
+  "model_id": "openai:qwen3:4b",
+  "timestamp": "2026-11-16T15:31:10.920924Z",
+  "kind": "response",
+  "provider_name": "openai",
+  "provider_url": "http://localhost:11434/v1/",
+  "canonical_system": "openai",
+  "provider_details": {
+   "finish_reason": "stop",
+   "timestamp": "2026-11-16T15:31:10Z"
+  },
+  "provider_response_id": "chatcmpl-250",
+  "finish_reason": "stop",
+  "run_id": "01a1e4fa-827f-77f9-b282-77abc913ded6",
+  "conversation_id": "01a1e4fa-3c97-70b0-9f76-d3aed3487891",
+  "metadata": null,
+  "workspace_ref": null,
+  "history_digest": null,
+  "failed_attempts": null,
+  "state": "complete"
+ }
+]
